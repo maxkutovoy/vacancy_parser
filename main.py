@@ -1,20 +1,9 @@
 import requests
-from pprint import pprint
+from terminaltables import AsciiTable
 
 import os
 from dotenv import load_dotenv
 
-languages = [
-    'javascript',
-    'java',
-    'python',
-    # 'ruby',
-    # 'php',
-    # 'c++',
-    # 'c',
-    # 'go',
-    # 'Objective-C'
-]
 load_dotenv()
 
 
@@ -22,12 +11,12 @@ def predict_salary(salary_from, salary_to):
     if (salary_from is None or salary_from == 0) & (salary_to is None or salary_to == 0):
         return None
     elif salary_from is None or salary_from == 0:
-        predict_rub_salary = salary_to * 0.8
+        predict_mid_salary = salary_to * 0.8
     elif salary_to is None or salary_to == 0:
-        predict_rub_salary = salary_from * 1.2
+        predict_mid_salary = salary_from * 1.2
     else:
-        predict_rub_salary = salary_to + salary_from / 2
-    return predict_rub_salary
+        predict_mid_salary = salary_to + salary_from / 2
+    return predict_mid_salary
 
 
 def predict_rub_salary_hh(vacancy):
@@ -49,20 +38,19 @@ def predict_rub_salary_sj(vacancy):
         return None
 
 
-def superjob_parser():
-    superjob_token = os.getenv("SUPERJOB_TOKEN")
+def superjob_parser(token, key_words):
     url = "https://api.superjob.ru/2.0/vacancies/"
     headers = {
-        "X-Api-App-Id": superjob_token
+        "X-Api-App-Id": token
     }
     language_statistic = {}
-    for language in languages:
+    for language in key_words:
         all_mid_salaries = []
         for page in range(5):
             payload = {
                 'keyword': language,
                 'town': 4,
-                'count':100,
+                'count': 100,
                 'page': page,
             }
             response = requests.get(url, headers=headers, params=payload)
@@ -78,13 +66,13 @@ def superjob_parser():
             "vacancies_processed": len(all_mid_salaries),
             "average_salary": int(mid_salary),
         }
-    pprint(language_statistic)
+    return language_statistic
 
 
-def hh_parser():
+def hh_parser(key_words):
     hh_api_url = 'https://api.hh.ru/vacancies'
     language_statistic = {}
-    for language in languages:
+    for language in key_words:
         all_mid_salaries = []
         for page in range(20):
             params = {
@@ -100,19 +88,54 @@ def hh_parser():
                 predict_rub_salary = predict_rub_salary_hh(vacancy)
                 if predict_rub_salary is not None:
                     all_mid_salaries.append(predict_rub_salary)
-        mid_salary = sum(all_mid_salaries)/len(all_mid_salaries)
+        mid_salary = sum(all_mid_salaries) / len(all_mid_salaries)
         language_statistic[language] = {
             "vacancies_found": all_vacancies['found'],
             "vacancies_processed": len(all_mid_salaries),
             "average_salary": int(mid_salary),
         }
-    pprint(language_statistic)
+    return language_statistic
+
+
+def draw_table(title, statistic_dict):
+    table_data = [
+        ['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата'],
+    ]
+    for language, statistic in statistic_dict.items():
+        language_statistic = [
+            language,
+            statistic['vacancies_found'],
+            statistic['vacancies_processed'],
+            statistic['average_salary']
+        ]
+        table_data.append(language_statistic)
+    title = title
+    table_instance = AsciiTable(table_data, title)
+    table_instance.justify_columns[1, 2, 3] = 'center'
+    print(table_instance.table)
+    print()
 
 
 def main():
-    superjob_parser()
-    hh_parser()
+    languages = [
+        'javascript',
+        'java',
+        'python',
+        'ruby',
+        'php',
+        'c++',
+        'c',
+        'go',
+        'Objective-C'
+    ]
 
+    superjob_token = os.getenv("SUPERJOB_TOKEN")
+    languages_sj_statistic = superjob_parser(superjob_token, languages)
+    languages_hh_statistic = hh_parser(languages)
+    sj_table_title = 'HeadHunter Moscow'
+    hh_table_title = 'SuperJob Moscow'
+    draw_table(sj_table_title, languages_sj_statistic)
+    draw_table(hh_table_title, languages_hh_statistic)
 
 
 if __name__ == '__main__':
