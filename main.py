@@ -38,17 +38,17 @@ def predict_rub_salary_sj(vacancy):
         return None
 
 
-def superjob_parser(token, key_words):
+def superjob_parser(token, professions):
     url = "https://api.superjob.ru/2.0/vacancies/"
     headers = {
         "X-Api-App-Id": token
     }
-    language_statistic = {}
-    for language in key_words:
+    professon_statistic = {}
+    for profession in professions:
         all_mid_salaries = []
         for page in range(5):
             payload = {
-                'keyword': language,
+                'keyword': profession,
                 'town': 4,
                 'count': 100,
                 'page': page,
@@ -61,22 +61,22 @@ def superjob_parser(token, key_words):
                 if predict_rub_salary is not None:
                     all_mid_salaries.append(predict_rub_salary)
         mid_salary = sum(all_mid_salaries) / len(all_mid_salaries)
-        language_statistic[language] = {
+        professon_statistic[profession] = {
             "vacancies_found": all_vacancies['total'],
             "vacancies_processed": len(all_mid_salaries),
             "average_salary": int(mid_salary),
         }
-    return language_statistic
+    return professon_statistic
 
 
-def hh_parser(key_words):
+def hh_parser(professions):
     hh_api_url = 'https://api.hh.ru/vacancies'
-    language_statistic = {}
-    for language in key_words:
+    profession_statistic = {}
+    for profession in professions:
         all_mid_salaries = []
         for page in range(20):
             params = {
-                'text': language,
+                'text': profession,
                 'area': '1',
                 'page': page,
                 'per_page': 100,
@@ -89,26 +89,26 @@ def hh_parser(key_words):
                 if predict_rub_salary is not None:
                     all_mid_salaries.append(predict_rub_salary)
         mid_salary = sum(all_mid_salaries) / len(all_mid_salaries)
-        language_statistic[language] = {
+        profession_statistic[language] = {
             "vacancies_found": all_vacancies['found'],
             "vacancies_processed": len(all_mid_salaries),
             "average_salary": int(mid_salary),
         }
-    return language_statistic
+    return profession_statistic
 
 
 def draw_table(title, statistic_dict):
     table_data = [
         ['Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата'],
     ]
-    for language, statistic in statistic_dict.items():
-        language_statistic = [
-            language,
+    for profession, statistic in statistic_dict.items():
+        profession_statistic = [
+            profession,
             statistic['vacancies_found'],
             statistic['vacancies_processed'],
             statistic['average_salary']
         ]
-        table_data.append(language_statistic)
+        table_data.append(profession_statistic)
     title = title
     table_instance = AsciiTable(table_data, title)
     table_instance.justify_columns[1, 2, 3] = 'center'
@@ -117,7 +117,7 @@ def draw_table(title, statistic_dict):
 
 
 def main():
-    languages = [
+    professions = [
         'javascript',
         'java',
         'python',
@@ -130,12 +130,12 @@ def main():
     ]
 
     superjob_token = os.getenv("SUPERJOB_TOKEN")
-    languages_sj_statistic = superjob_parser(superjob_token, languages)
-    languages_hh_statistic = hh_parser(languages)
+    professions_sj_statistic = superjob_parser(superjob_token, professions)
+    professions_hh_statistic = hh_parser(professions)
     sj_table_title = 'HeadHunter Moscow'
     hh_table_title = 'SuperJob Moscow'
-    draw_table(sj_table_title, languages_sj_statistic)
-    draw_table(hh_table_title, languages_hh_statistic)
+    draw_table(sj_table_title, professions_sj_statistic)
+    draw_table(hh_table_title, professions_hh_statistic)
 
 
 if __name__ == '__main__':
