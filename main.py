@@ -41,7 +41,7 @@ def superjob_parser(token, professions):
     headers = {
         "X-Api-App-Id": token
     }
-    professon_statistic = {}
+    profession_statistic = {}
     for profession in professions:
         all_mid_salaries = []
         for page in range(2):
@@ -59,12 +59,12 @@ def superjob_parser(token, professions):
                 if predict_rub_salary:
                     all_mid_salaries.append(predict_rub_salary)
         mid_salary = sum(all_mid_salaries) / len(all_mid_salaries)
-        professon_statistic[profession] = {
+        profession_statistic[profession] = {
             "vacancies_found": all_vacancies['total'],
             "vacancies_processed": len(all_mid_salaries),
             "average_salary": int(mid_salary),
         }
-    return professon_statistic
+    return profession_statistic
 
 
 def hh_parser(professions):
