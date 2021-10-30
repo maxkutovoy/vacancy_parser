@@ -41,7 +41,7 @@ def get_superjob_statistic(token, professions):
     headers = {
         "X-Api-App-Id": token
     }
-    profession_statistic = {}
+    professions_statistic = {}
     for profession in professions:
         all_mid_salaries = []
         for page in range(2):
@@ -59,17 +59,17 @@ def get_superjob_statistic(token, professions):
                 if predict_rub_salary:
                     all_mid_salaries.append(predict_rub_salary)
         mid_salary = sum(all_mid_salaries) / len(all_mid_salaries)
-        profession_statistic[profession] = {
+        professions_statistic[profession] = {
             "vacancies_found": all_vacancies['total'],
             "vacancies_processed": len(all_mid_salaries),
             "average_salary": int(mid_salary),
         }
-    return profession_statistic
+    return professions_statistic
 
 
 def get_hh_statistic(professions):
     hh_api_url = 'https://api.hh.ru/vacancies'
-    profession_statistic = {}
+    professions_statistic = {}
     for profession in professions:
         all_mid_salaries = []
         for page in range(2):
@@ -87,12 +87,12 @@ def get_hh_statistic(professions):
                 if predict_rub_salary:
                     all_mid_salaries.append(predict_rub_salary)
         mid_salary = sum(all_mid_salaries) / len(all_mid_salaries)
-        profession_statistic[profession] = {
+        professions_statistic[profession] = {
             "vacancies_found": all_vacancies['found'],
             "vacancies_processed": len(all_mid_salaries),
             "average_salary": int(mid_salary),
         }
-    return profession_statistic
+    return professions_statistic
 
 
 def draw_table(title, statistic_dict):
