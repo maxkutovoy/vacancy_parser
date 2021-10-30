@@ -36,7 +36,7 @@ def predict_rub_salary_sj(vacancy):
         return None
 
 
-def superjob_parser(token, professions):
+def get_superjob_statistic(token, professions):
     url = "https://api.superjob.ru/2.0/vacancies/"
     headers = {
         "X-Api-App-Id": token
@@ -67,7 +67,7 @@ def superjob_parser(token, professions):
     return profession_statistic
 
 
-def hh_parser(professions):
+def get_hh_statistic(professions):
     hh_api_url = 'https://api.hh.ru/vacancies'
     profession_statistic = {}
     for profession in professions:
@@ -128,8 +128,8 @@ def main():
     ]
 
     superjob_token = os.getenv("SUPERJOB_TOKEN")
-    professions_sj_statistic = superjob_parser(superjob_token, professions)
-    professions_hh_statistic = hh_parser(professions)
+    professions_sj_statistic = get_superjob_statistic(superjob_token, professions)
+    professions_hh_statistic = get_hh_statistic(professions)
     sj_table_title = 'HeadHunter Moscow'
     hh_table_title = 'SuperJob Moscow'
     draw_table(sj_table_title, professions_sj_statistic)
