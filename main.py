@@ -87,7 +87,7 @@ def hh_parser(professions):
                 if predict_rub_salary is not None:
                     all_mid_salaries.append(predict_rub_salary)
         mid_salary = sum(all_mid_salaries) / len(all_mid_salaries)
-        profession_statistic[language] = {
+        profession_statistic[profession] = {
             "vacancies_found": all_vacancies['found'],
             "vacancies_processed": len(all_mid_salaries),
             "average_salary": int(mid_salary),
@@ -109,7 +109,6 @@ def draw_table(title, statistic_dict):
         table_data.append(profession_statistic)
     title = title
     table_instance = AsciiTable(table_data, title)
-    table_instance.justify_columns[1, 2, 3] = 'center'
     print(table_instance.table)
     print()
 
