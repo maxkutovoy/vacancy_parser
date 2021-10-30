@@ -6,11 +6,11 @@ from dotenv import load_dotenv
 
 
 def predict_salary(salary_from, salary_to):
-    if (salary_from is None or salary_from == 0) & (salary_to is None or salary_to == 0):
+    if (not salary_from) & (not salary_to):
         return None
-    elif salary_from is None or salary_from == 0:
+    elif not salary_from:
         predict_mid_salary = salary_to * 0.8
-    elif salary_to is None or salary_to == 0:
+    elif not salary_to:
         predict_mid_salary = salary_from * 1.2
     else:
         predict_mid_salary = salary_to + salary_from / 2
@@ -44,7 +44,7 @@ def superjob_parser(token, professions):
     professon_statistic = {}
     for profession in professions:
         all_mid_salaries = []
-        for page in range(5):
+        for page in range(2):
             payload = {
                 'keyword': profession,
                 'town': 4,
@@ -56,7 +56,7 @@ def superjob_parser(token, professions):
             all_vacancies = response.json()
             for vacancy in all_vacancies['objects']:
                 predict_rub_salary = predict_rub_salary_sj(vacancy)
-                if predict_rub_salary is not None:
+                if predict_rub_salary:
                     all_mid_salaries.append(predict_rub_salary)
         mid_salary = sum(all_mid_salaries) / len(all_mid_salaries)
         professon_statistic[profession] = {
@@ -72,7 +72,7 @@ def hh_parser(professions):
     profession_statistic = {}
     for profession in professions:
         all_mid_salaries = []
-        for page in range(20):
+        for page in range(2):
             params = {
                 'text': profession,
                 'area': '1',
@@ -84,7 +84,7 @@ def hh_parser(professions):
             all_vacancies = response.json()
             for vacancy in all_vacancies['items']:
                 predict_rub_salary = predict_rub_salary_hh(vacancy)
-                if predict_rub_salary is not None:
+                if predict_rub_salary:
                     all_mid_salaries.append(predict_rub_salary)
         mid_salary = sum(all_mid_salaries) / len(all_mid_salaries)
         profession_statistic[profession] = {
