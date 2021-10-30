@@ -107,10 +107,8 @@ def draw_table(title, statistic_dict):
             statistic['average_salary']
         ]
         table_data.append(profession_statistic)
-    title = title
     table_instance = AsciiTable(table_data, title)
-    print(table_instance.table)
-    print()
+    return table_instance.table
 
 
 def main():
@@ -132,8 +130,8 @@ def main():
     professions_hh_statistic = get_hh_statistic(professions)
     sj_table_title = 'HeadHunter Moscow'
     hh_table_title = 'SuperJob Moscow'
-    draw_table(sj_table_title, professions_sj_statistic)
-    draw_table(hh_table_title, professions_hh_statistic)
+    print(draw_table(sj_table_title, professions_sj_statistic))
+    print(draw_table(hh_table_title, professions_hh_statistic))
 
 
 if __name__ == '__main__':
