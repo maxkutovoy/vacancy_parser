@@ -13,7 +13,7 @@ def predict_salary(salary_from, salary_to):
     elif not salary_to:
         predicted_mid_salary = salary_from * 1.2
     else:
-        predicted_mid_salary = (salary_to+salary_from)/2
+        predicted_mid_salary = (salary_to+salary_from)/ 2
     return predicted_mid_salary
 
 
@@ -57,7 +57,8 @@ def get_average_salary(all_predicted_salaries):
 
 def get_all_sj_vacancies(url, headers, profession):
     all_sj_vacancies = []
-    for page in range(20):
+    for page in range(2):
+
         payload = {
             'keyword': profession,
             'town': 4,
@@ -67,7 +68,7 @@ def get_all_sj_vacancies(url, headers, profession):
         response = requests.get(url, headers=headers, params=payload)
         response.raise_for_status()
         received_vacancies = response.json()
-        all_sj_vacancies += list(received_vacancies['objects'])
+        all_sj_vacancies += received_vacancies['objects']
         if not received_vacancies['more']:
             break
     return all_sj_vacancies
@@ -75,7 +76,7 @@ def get_all_sj_vacancies(url, headers, profession):
 
 def get_all_hh_vacancies(url, profession):
     all_hh_vacancies = []
-    for page in range(10):
+    for page in range(2):
         payload = {
             'text': profession,
             'area': '1',
@@ -86,7 +87,8 @@ def get_all_hh_vacancies(url, profession):
         response.raise_for_status()
         received_vacancies = response.json()
         if received_vacancies['items']:
-            all_hh_vacancies += list(received_vacancies['items'])
+            all_hh_vacancies += received_vacancies['items']
+            print(type(received_vacancies['items']))
         else:
             break
     return all_hh_vacancies
@@ -149,12 +151,12 @@ def main():
         'javascript',
         'java',
         'python',
-        'ruby',
-        'php',
-        'c++',
-        'c',
-        'go',
-        'Objective-C'
+        # 'ruby',
+        # 'php',
+        # 'c++',
+        # 'c',
+        # 'go',
+        # 'Objective-C'
     ]
 
     hh_api_url = 'https://api.hh.ru/vacancies'
