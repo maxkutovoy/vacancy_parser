@@ -13,7 +13,7 @@ def predict_salary(salary_from, salary_to):
     elif not salary_to:
         predicted_mid_salary = salary_from * 1.2
     else:
-        predicted_mid_salary = (salary_to+salary_from)/ 2
+        predicted_mid_salary = (salary_to+salary_from) / 2
     return predicted_mid_salary
 
 
@@ -55,7 +55,11 @@ def get_average_salary(all_predicted_salaries):
     return int(average_salary)
 
 
-def get_all_sj_vacancies(url, headers, profession):
+def get_all_sj_vacancies(token, profession):
+    sj_api_url = "https://api.superjob.ru/2.0/vacancies/"
+    headers = {
+        "X-Api-App-Id": token
+    }
     all_sj_vacancies = []
     for page in range(2):
 
@@ -65,7 +69,7 @@ def get_all_sj_vacancies(url, headers, profession):
             'count': 100,
             'page': page,
         }
-        response = requests.get(url, headers=headers, params=payload)
+        response = requests.get(sj_api_url, headers=headers, params=payload)
         response.raise_for_status()
         received_vacancies = response.json()
         all_sj_vacancies += received_vacancies['objects']
@@ -74,7 +78,8 @@ def get_all_sj_vacancies(url, headers, profession):
     return all_sj_vacancies
 
 
-def get_all_hh_vacancies(url, profession):
+def get_all_hh_vacancies(profession):
+    hh_api_url = 'https://api.hh.ru/vacancies'
     all_hh_vacancies = []
     for page in range(2):
         payload = {
@@ -83,24 +88,20 @@ def get_all_hh_vacancies(url, profession):
             'page': page,
             'per_page': 100,
         }
-        response = requests.get(url, params=payload)
+        response = requests.get(hh_api_url, params=payload)
         response.raise_for_status()
         received_vacancies = response.json()
         if received_vacancies['items']:
             all_hh_vacancies += received_vacancies['items']
-            print(type(received_vacancies['items']))
         else:
             break
     return all_hh_vacancies
 
 
-def get_superjob_statistic(token, sj_api_url, professions):
-    headers = {
-        "X-Api-App-Id": token
-    }
+def get_superjob_statistic(token, professions):
     professions_statistic = {}
     for profession in professions:
-        all_sj_vacancies = get_all_sj_vacancies(sj_api_url, headers, profession)
+        all_sj_vacancies = get_all_sj_vacancies(token, profession)
         all_predicted_salaries = get_all_sj_predicted_salaries(all_sj_vacancies)
         average_salary = get_average_salary(all_predicted_salaries)
         vacancies_found = len(all_sj_vacancies)
@@ -113,10 +114,10 @@ def get_superjob_statistic(token, sj_api_url, professions):
     return professions_statistic
 
 
-def get_hh_statistic(hh_api_url, professions):
+def get_hh_statistic(professions):
     professions_statistic = {}
     for profession in professions:
-        all_hh_vacancies = get_all_hh_vacancies(hh_api_url, profession)
+        all_hh_vacancies = get_all_hh_vacancies(profession)
         all_predicted_salaries = get_all_hh_predicted_salaries(all_hh_vacancies)
         average_salary = get_average_salary(all_predicted_salaries)
         vacancies_found = len(all_hh_vacancies)
@@ -159,11 +160,9 @@ def main():
         # 'Objective-C'
     ]
 
-    hh_api_url = 'https://api.hh.ru/vacancies'
-    sj_api_url = "https://api.superjob.ru/2.0/vacancies/"
     sj_token = os.getenv("SUPERJOB_TOKEN")
-    professions_hh_statistic = get_hh_statistic(hh_api_url, professions)
-    professions_sj_statistic = get_superjob_statistic(sj_token, sj_api_url, professions)
+    professions_hh_statistic = get_hh_statistic(professions)
+    professions_sj_statistic = get_superjob_statistic(sj_token, professions)
     sj_table_title = 'SuperJob Moscow'
     hh_table_title = 'HeadHunter Moscow'
     print(draw_table(sj_table_title, professions_sj_statistic))
