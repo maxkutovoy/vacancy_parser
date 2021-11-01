@@ -23,8 +23,6 @@ def predict_rub_salary_hh(vacancy):
             salary_from = vacancy['salary']['from']
             salary_to = vacancy['salary']['to']
             return predict_salary(salary_from, salary_to)
-    else:
-        return None
 
 
 def predict_rub_salary_sj(vacancy):
@@ -32,8 +30,6 @@ def predict_rub_salary_sj(vacancy):
         salary_from = vacancy['payment_from']
         salary_to = vacancy['payment_to']
         return predict_salary(salary_from, salary_to)
-    else:
-        return None
 
 
 def get_all_sj_predicted_salaries(all_vacancies):
@@ -55,7 +51,7 @@ def get_all_hh_predicted_salaries(all_vacancies):
 
 
 def get_average_salary(all_predicted_salaries):
-    ._salary = sum(all_predicted_salaries) / len(all_predicted_salaries)
+    average_salary = sum(all_predicted_salaries) / len(all_predicted_salaries)
     return int(average_salary)
 
 
@@ -79,7 +75,7 @@ def get_all_sj_vacancies(url, headers, profession):
 
 def get_all_hh_vacancies(url, profession):
     all_hh_vacancies = []
-    for page in range(20):
+    for page in range(10):
         payload = {
             'text': profession,
             'area': '1',
