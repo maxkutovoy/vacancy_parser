@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 
 def predict_salary(salary_from, salary_to):
-    if (not salary_from) & (not salary_to):
+    if not salary_from and not salary_to:
         return None
     elif not salary_from:
         predicted_mid_salary = salary_to * 0.8
@@ -19,11 +19,10 @@ def predict_salary(salary_from, salary_to):
 
 
 def predict_rub_salary_hh(vacancy):
-    if vacancy['salary']:
-        if vacancy['salary']['currency'] == 'RUR':
-            salary_from = vacancy['salary']['from']
-            salary_to = vacancy['salary']['to']
-            return predict_salary(salary_from, salary_to)
+    if vacancy['salary'] and vacancy['salary']['currency'] == 'RUR':
+        salary_from = vacancy['salary']['from']
+        salary_to = vacancy['salary']['to']
+        return predict_salary(salary_from, salary_to)
 
 
 def predict_rub_salary_sj(vacancy):
@@ -60,6 +59,10 @@ def get_average_salary(all_predicted_salaries):
 
 
 def get_all_sj_vacancies(token, profession):
+    sj_cities_indexes = {
+        'Moscow': 4,
+        'Владивосток': 70,
+    }
     sj_api_url = "https://api.superjob.ru/2.0/vacancies/"
     headers = {
         "X-Api-App-Id": token
@@ -68,7 +71,7 @@ def get_all_sj_vacancies(token, profession):
     for page in itertools.count(start=0, step=1):
         payload = {
             'keyword': profession,
-            'town': 4,
+            'town': sj_cities_indexes['Moscow'],
             'count': 100,
             'page': page,
         }
@@ -83,12 +86,17 @@ def get_all_sj_vacancies(token, profession):
 
 
 def get_all_hh_vacancies(profession):
+    hh_cities_indexes = {
+        'Moscow': '1',
+        'Saint Petersburg': '2',
+        'Omsk': '68',
+    }
     hh_api_url = 'https://api.hh.ru/vacancies'
     downloaded_hh_vacancies = []
     for page in itertools.count(start=0, step=1):
         payload = {
             'text': profession,
-            'area': '1',
+            'area': hh_cities_indexes['Moscow'],
             'page': page,
             'per_page': 100,
         }
@@ -154,12 +162,12 @@ def main():
         'javascript',
         'java',
         'python',
-        # 'ruby',
-        # 'php',
-        # 'c++',
-        # 'c',
-        # 'go',
-        # 'Objective-C'
+        'ruby',
+        'php',
+        'c++',
+        'c',
+        'go',
+        'Objective-C'
     ]
 
     sj_token = os.getenv("SUPERJOB_TOKEN")
