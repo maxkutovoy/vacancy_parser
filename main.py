@@ -13,7 +13,7 @@ def predict_salary(salary_from, salary_to):
     elif not salary_to:
         predicted_mid_salary = salary_from * 1.2
     else:
-        predicted_mid_salary = salary_to + salary_from / 2
+        predicted_mid_salary = (salary_to+salary_from)/2
     return predicted_mid_salary
 
 
