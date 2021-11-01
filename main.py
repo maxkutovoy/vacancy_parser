@@ -1,6 +1,7 @@
 import requests
 from terminaltables import AsciiTable
 
+import itertools
 import os
 from dotenv import load_dotenv
 
@@ -61,8 +62,7 @@ def get_all_sj_vacancies(token, profession):
         "X-Api-App-Id": token
     }
     downloaded_sj_vacancies = []
-    for page in range(2):
-
+    for page in itertools.count(start=0, step=1):
         payload = {
             'keyword': profession,
             'town': 4,
@@ -82,7 +82,7 @@ def get_all_sj_vacancies(token, profession):
 def get_all_hh_vacancies(profession):
     hh_api_url = 'https://api.hh.ru/vacancies'
     downloaded_hh_vacancies = []
-    for page in range(2):
+    for page in itertools.count(start=0, step=1):
         payload = {
             'text': profession,
             'area': '1',
@@ -92,11 +92,10 @@ def get_all_hh_vacancies(profession):
         response = requests.get(hh_api_url, params=payload)
         response.raise_for_status()
         received_vacancies = response.json()
-        if received_vacancies['items']:
-            downloaded_hh_vacancies += received_vacancies['items']
-        else:
+        downloaded_hh_vacancies += received_vacancies['items']
+        if page is received_vacancies['pages']-1:
             break
-        vacancies_found = received_vacancies['found']
+    vacancies_found = received_vacancies['found']
     return downloaded_hh_vacancies, vacancies_found
 
 
