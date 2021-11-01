@@ -60,7 +60,7 @@ def get_all_sj_vacancies(token, profession):
     headers = {
         "X-Api-App-Id": token
     }
-    all_sj_vacancies = []
+    downloaded_sj_vacancies = []
     for page in range(2):
 
         payload = {
@@ -72,15 +72,16 @@ def get_all_sj_vacancies(token, profession):
         response = requests.get(sj_api_url, headers=headers, params=payload)
         response.raise_for_status()
         received_vacancies = response.json()
-        all_sj_vacancies += received_vacancies['objects']
+        downloaded_sj_vacancies += received_vacancies['objects']
         if not received_vacancies['more']:
             break
-    return all_sj_vacancies
+    vacancies_found = received_vacancies['total']
+    return downloaded_sj_vacancies, vacancies_found
 
 
 def get_all_hh_vacancies(profession):
     hh_api_url = 'https://api.hh.ru/vacancies'
-    all_hh_vacancies = []
+    downloaded_hh_vacancies = []
     for page in range(2):
         payload = {
             'text': profession,
@@ -92,23 +93,23 @@ def get_all_hh_vacancies(profession):
         response.raise_for_status()
         received_vacancies = response.json()
         if received_vacancies['items']:
-            all_hh_vacancies += received_vacancies['items']
+            downloaded_hh_vacancies += received_vacancies['items']
         else:
             break
-    return all_hh_vacancies
+        vacancies_found = received_vacancies['found']
+    return downloaded_hh_vacancies, vacancies_found
 
 
 def get_superjob_statistic(token, professions):
     professions_statistic = {}
     for profession in professions:
-        all_sj_vacancies = get_all_sj_vacancies(token, profession)
-        all_predicted_salaries = get_all_sj_predicted_salaries(all_sj_vacancies)
+        downloaded_hh_vacancies, vacancies_found = get_all_sj_vacancies(token, profession)
+        all_predicted_salaries = get_all_sj_predicted_salaries(downloaded_hh_vacancies)
         average_salary = get_average_salary(all_predicted_salaries)
-        vacancies_found = len(all_sj_vacancies)
 
         professions_statistic[profession] = {
             "vacancies_found": vacancies_found,
-            "vacancies_processed": len(all_predicted_salaries),
+            "vacancies_processed": len(downloaded_hh_vacancies),
             "average_salary": average_salary,
         }
     return professions_statistic
@@ -117,14 +118,13 @@ def get_superjob_statistic(token, professions):
 def get_hh_statistic(professions):
     professions_statistic = {}
     for profession in professions:
-        all_hh_vacancies = get_all_hh_vacancies(profession)
-        all_predicted_salaries = get_all_hh_predicted_salaries(all_hh_vacancies)
+        downloaded_hh_vacancies, vacancies_found = get_all_hh_vacancies(profession)
+        all_predicted_salaries = get_all_hh_predicted_salaries(downloaded_hh_vacancies)
         average_salary = get_average_salary(all_predicted_salaries)
-        vacancies_found = len(all_hh_vacancies)
 
         professions_statistic[profession] = {
             "vacancies_found": vacancies_found,
-            "vacancies_processed": len(all_predicted_salaries),
+            "vacancies_processed": len(downloaded_hh_vacancies),
             "average_salary": int(average_salary),
         }
     return professions_statistic
