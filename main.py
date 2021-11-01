@@ -52,7 +52,10 @@ def get_all_hh_predicted_salaries(all_vacancies):
 
 
 def get_average_salary(all_predicted_salaries):
-    average_salary = sum(all_predicted_salaries) / len(all_predicted_salaries)
+    try:
+        average_salary = sum(all_predicted_salaries) / len(all_predicted_salaries)
+    except ZeroDivisionError:
+        return 0
     return int(average_salary)
 
 
