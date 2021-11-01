@@ -9,12 +9,12 @@ def predict_salary(salary_from, salary_to):
     if (not salary_from) & (not salary_to):
         return None
     elif not salary_from:
-        predict_mid_salary = salary_to * 0.8
+        predicted_mid_salary = salary_to * 0.8
     elif not salary_to:
-        predict_mid_salary = salary_from * 1.2
+        predicted_mid_salary = salary_from * 1.2
     else:
-        predict_mid_salary = salary_to + salary_from / 2
-    return predict_mid_salary
+        predicted_mid_salary = salary_to + salary_from / 2
+    return predicted_mid_salary
 
 
 def predict_rub_salary_hh(vacancy):
@@ -39,23 +39,23 @@ def predict_rub_salary_sj(vacancy):
 def get_all_sj_predicted_salaries(all_vacancies):
     all_predicted_salaries = []
     for vacancy in all_vacancies:
-        predict_rub_salary = predict_rub_salary_sj(vacancy)
-        if predict_rub_salary:
-            all_predicted_salaries.append(predict_rub_salary)
+        predicted_rub_salary = predict_rub_salary_sj(vacancy)
+        if predicted_rub_salary:
+            all_predicted_salaries.append(predicted_rub_salary)
     return all_predicted_salaries
 
 
 def get_all_hh_predicted_salaries(all_vacancies):
     all_predicted_salaries = []
     for vacancy in all_vacancies:
-        predict_rub_salary = predict_rub_salary_hh(vacancy)
-        if predict_rub_salary:
-            all_predicted_salaries.append(predict_rub_salary)
+        predicted_rub_salary = predict_rub_salary_hh(vacancy)
+        if predicted_rub_salary:
+            all_predicted_salaries.append(predicted_rub_salary)
     return all_predicted_salaries
 
 
 def get_average_salary(all_predicted_salaries):
-    average_salary = sum(all_predicted_salaries) / len(all_predicted_salaries)
+    ._salary = sum(all_predicted_salaries) / len(all_predicted_salaries)
     return int(average_salary)
 
 
