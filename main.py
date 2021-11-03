@@ -32,94 +32,94 @@ def predict_rub_salary_sj(vacancy):
         return predict_salary(salary_from, salary_to)
 
 
-def get_all_sj_predicted_salaries(all_vacancies):
-    all_predicted_salaries = []
-    for vacancy in all_vacancies:
+def get_sj_predicted_salaries(vacancies):
+    predicted_salaries = []
+    for vacancy in vacancies:
         predicted_rub_salary = predict_rub_salary_sj(vacancy)
         if predicted_rub_salary:
-            all_predicted_salaries.append(predicted_rub_salary)
-    return all_predicted_salaries
+            predicted_salaries.append(predicted_rub_salary)
+    return predicted_salaries
 
 
-def get_all_hh_predicted_salaries(all_vacancies):
-    all_predicted_salaries = []
-    for vacancy in all_vacancies:
+def get_hh_predicted_salaries(vacancies):
+    predicted_salaries = []
+    for vacancy in vacancies:
         predicted_rub_salary = predict_rub_salary_hh(vacancy)
         if predicted_rub_salary:
-            all_predicted_salaries.append(predicted_rub_salary)
-    return all_predicted_salaries
+            predicted_salaries.append(predicted_rub_salary)
+    return predicted_salaries
 
 
-def get_average_salary(all_predicted_salaries):
+def get_average_salary(predicted_salaries):
     try:
-        average_salary = sum(all_predicted_salaries) / len(all_predicted_salaries)
+        average_salary = sum(predicted_salaries) / len(predicted_salaries)
     except ZeroDivisionError:
         return 0
     return int(average_salary)
 
 
-def get_all_sj_vacancies(token, profession):
-    sj_cities_indexes = {
+def get_sj_vacancies(token, profession):
+    cities_indexes = {
         'Moscow': 4,
         'Владивосток': 70,
     }
-    sj_api_url = "https://api.superjob.ru/2.0/vacancies/"
+    url = "https://api.superjob.ru/2.0/vacancies/"
     headers = {
         "X-Api-App-Id": token
     }
-    downloaded_sj_vacancies = []
+    downloaded_vacancies = []
     for page in itertools.count(start=0, step=1):
         payload = {
             'keyword': profession,
-            'town': sj_cities_indexes['Moscow'],
+            'town': cities_indexes['Moscow'],
             'count': 100,
             'page': page,
         }
-        response = requests.get(sj_api_url, headers=headers, params=payload)
+        response = requests.get(url, headers=headers, params=payload)
         response.raise_for_status()
         received_vacancies = response.json()
-        downloaded_sj_vacancies += received_vacancies['objects']
+        downloaded_vacancies += received_vacancies['objects']
         if not received_vacancies['more']:
             break
     vacancies_found = received_vacancies['total']
-    return downloaded_sj_vacancies, vacancies_found
+    return downloaded_vacancies, vacancies_found
 
 
 def get_all_hh_vacancies(profession):
-    hh_cities_indexes = {
+    cities_indexes = {
         'Moscow': '1',
         'Saint Petersburg': '2',
         'Omsk': '68',
     }
-    hh_api_url = 'https://api.hh.ru/vacancies'
-    downloaded_hh_vacancies = []
+    url = 'https://api.hh.ru/vacancies'
+    downloaded_vacancies = []
     for page in itertools.count(start=0, step=1):
         payload = {
             'text': profession,
-            'area': hh_cities_indexes['Moscow'],
+            'area': cities_indexes['Moscow'],
             'page': page,
             'per_page': 100,
         }
-        response = requests.get(hh_api_url, params=payload)
+        response = requests.get(url, params=payload)
         response.raise_for_status()
         received_vacancies = response.json()
-        downloaded_hh_vacancies += received_vacancies['items']
+        downloaded_vacancies += received_vacancies['items']
         if page is received_vacancies['pages']-1:
             break
     vacancies_found = received_vacancies['found']
-    return downloaded_hh_vacancies, vacancies_found
+    return downloaded_vacancies, vacancies_found
 
 
 def get_superjob_statistic(token, professions):
     professions_statistic = {}
     for profession in professions:
-        downloaded_hh_vacancies, vacancies_found = get_all_sj_vacancies(token, profession)
-        all_predicted_salaries = get_all_sj_predicted_salaries(downloaded_hh_vacancies)
-        average_salary = get_average_salary(all_predicted_salaries)
+        downloaded_vacancies, vacancies_found = get_sj_vacancies(token, profession)
+        predicted_salaries = get_sj_predicted_salaries(downloaded_vacancies)
+        average_salary = get_average_salary(predicted_salaries)
 
         professions_statistic[profession] = {
             "vacancies_found": vacancies_found,
-            "vacancies_processed": len(downloaded_hh_vacancies),
+            "vacancies_processed": len(downloaded_vacancies),
             "average_salary": average_salary,
         }
     return professions_statistic
@@ -128,13 +128,13 @@ def get_superjob_statistic(token, professions):
 def get_hh_statistic(professions):
     professions_statistic = {}
     for profession in professions:
-        downloaded_hh_vacancies, vacancies_found = get_all_hh_vacancies(profession)
-        all_predicted_salaries = get_all_hh_predicted_salaries(downloaded_hh_vacancies)
-        average_salary = get_average_salary(all_predicted_salaries)
+        downloaded_vacancies, vacancies_found = get_all_hh_vacancies(profession)
+        predicted_salaries = get_hh_predicted_salaries(downloaded_vacancies)
+        average_salary = get_average_salary(predicted_salaries)
 
         professions_statistic[profession] = {
             "vacancies_found": vacancies_found,
-            "vacancies_processed": len(downloaded_hh_vacancies),
+            "vacancies_processed": len(downloaded_vacancies),
             "average_salary": int(average_salary),
         }
     return professions_statistic
