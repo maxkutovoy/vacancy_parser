@@ -104,7 +104,7 @@ def get_all_hh_vacancies(profession):
         response.raise_for_status()
         received_vacancies = response.json()
         downloaded_vacancies += received_vacancies['items']
-        if page is received_vacancies['pages']-1:
+        if page is received_vacancies['pages'] - 1:
             break
     vacancies_found = received_vacancies['found']
     return downloaded_vacancies, vacancies_found
@@ -118,9 +118,9 @@ def get_superjob_statistic(token, professions):
         average_salary = get_average_salary(predicted_salaries)
 
         professions_statistic[profession] = {
-            "vacancies_found": vacancies_found,
-            "vacancies_processed": len(downloaded_vacancies),
-            "average_salary": average_salary,
+            'vacancies_found': vacancies_found,
+            'vacancies_processed': len(downloaded_vacancies),
+            'average_salary': average_salary,
         }
     return professions_statistic
 
@@ -133,9 +133,9 @@ def get_hh_statistic(professions):
         average_salary = get_average_salary(predicted_salaries)
 
         professions_statistic[profession] = {
-            "vacancies_found": vacancies_found,
-            "vacancies_processed": len(downloaded_vacancies),
-            "average_salary": int(average_salary),
+            'vacancies_found': vacancies_found,
+            'vacancies_processed': len(downloaded_vacancies),
+            'average_salary': int(average_salary),
         }
     return professions_statistic
 
@@ -170,7 +170,7 @@ def main():
         'Objective-C'
     ]
 
-    sj_token = os.getenv("SUPERJOB_TOKEN")
+    sj_token = os.getenv('SUPERJOB_TOKEN')
     professions_hh_statistic = get_hh_statistic(professions)
     professions_sj_statistic = get_superjob_statistic(sj_token, professions)
     sj_table_title = 'SuperJob Moscow'
