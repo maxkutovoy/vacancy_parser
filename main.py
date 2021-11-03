@@ -63,9 +63,9 @@ def get_sj_vacancies(token, profession):
         'Moscow': 4,
         'Владивосток': 70,
     }
-    url = "https://api.superjob.ru/2.0/vacancies/"
+    url = 'https://api.superjob.ru/2.0/vacancies/'
     headers = {
-        "X-Api-App-Id": token
+        'X-Api-App-Id': token
     }
     downloaded_vacancies = []
     for page in itertools.count(start=0, step=1):
